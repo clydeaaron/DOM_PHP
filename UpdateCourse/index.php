@@ -17,7 +17,6 @@
     $course = $data['course'];
     $shorten = $data['shortcut'];
     $year = $data['years'];
-    $details = $data['Subject'];
 
     $Insert = $function -> UpdateCourse($id, $course, $shorten, $year);
 
