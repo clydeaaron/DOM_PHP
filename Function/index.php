@@ -44,7 +44,7 @@
 
             return [
                 'valid' => true,
-                'data' => $user,
+                'data' => $user[0]['user_type'],
                 'msg' => "retrieved"
             ];
         }
