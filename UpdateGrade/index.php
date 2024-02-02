@@ -14,21 +14,15 @@
     $function = new functions();
 
     $id = $data['id'];
-    $course = $data['course'];
-    $shorten = $data['shortcut'];
-    $year = $data['years'];
-    $detail = $data['detail'];
+    $prelim = $data['prelim'];
+    $midterm = $data['midterm'];
+    $prefi = $data['prefi'];
+    $finals = $data['finals'];
 
-    $Insert = $function -> UpdateCourse($id, $course, $shorten, $year);
-
-    foreach($detail as $list) {
-        $subject = $list['subject'];
-        $type = $list['type'];
-        $unit = $list['unit'];
-    }
+    $Insert = $function -> UpdateGrades($id, $prelim, $midterm, $prefi, $finals);
 
     
     echo json_encode([
         'valid' => $Insert['valid'],
-        'msg' => $Insert['valid'] ? $Insert['msg'] : $Insert['error']
+        'msg' => $Insert['msg']
     ]);

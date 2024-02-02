@@ -13,19 +13,12 @@
     $data = json_decode($request_body, true);
     $function = new functions();
 
-    $id = $data['id'];
     $course = $data['course'];
-    $shorten = $data['shortcut'];
-    $year = $data['years'];
+    $shorten = $data['shorten'];
+    $years = $data['years'];
     $detail = $data['detail'];
 
-    $Insert = $function -> UpdateCourse($id, $course, $shorten, $year);
-
-    foreach($detail as $list) {
-        $subject = $list['subject'];
-        $type = $list['type'];
-        $unit = $list['unit'];
-    }
+    // $Insert = $function -> UpdateUser($id, $user, $email, $password, $fname, $midname, $lname, $birthdate, $gender, $type);
 
     
     echo json_encode([
