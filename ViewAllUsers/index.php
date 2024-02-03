@@ -24,6 +24,7 @@
     } else {
         echo json_encode([
             'valid' => false,
-            'error' => $view['error']
+            'error' => $view['error'],
+            'data' => []
         ]);
     }
