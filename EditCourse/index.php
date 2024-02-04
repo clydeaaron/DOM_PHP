@@ -13,18 +13,15 @@
     $data = json_decode($request_body, true);
     $function = new functions();
 
+    $course = $data['course'];
+    $shorten = $data['shorten'];
+    $years = $data['years'];
+    $detail = $data['detail'];
 
-    $view = $function -> ViewAllEnrolled();
+    // $Insert = $function -> UpdateUser($id, $user, $email, $password, $fname, $midname, $lname, $birthdate, $gender, $type);
 
-    if($view['valid']) {
-        echo json_encode([
-            'valid' => true,
-            'data' => $view['data']
-        ]);
-    } else {
-        echo json_encode([
-            'valid' => false,
-            'error' => $view['error'],
-            'data' => []
-        ]);
-    }
+    
+    echo json_encode([
+        'valid' => $Insert['valid'],
+        'msg' => $Insert['valid'] ? $Insert['msg'] : $Insert['error']
+    ]);

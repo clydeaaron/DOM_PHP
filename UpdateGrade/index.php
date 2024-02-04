@@ -13,18 +13,16 @@
     $data = json_decode($request_body, true);
     $function = new functions();
 
+    $id = $data['id'];
+    $prelim = $data['prelim'];
+    $midterm = $data['midterm'];
+    $prefi = $data['prefi'];
+    $finals = $data['finals'];
 
-    $view = $function -> ViewAllEnrolled();
+    $Insert = $function -> UpdateGrades($id, $prelim, $midterm, $prefi, $finals);
 
-    if($view['valid']) {
-        echo json_encode([
-            'valid' => true,
-            'data' => $view['data']
-        ]);
-    } else {
-        echo json_encode([
-            'valid' => false,
-            'error' => $view['error'],
-            'data' => []
-        ]);
-    }
+    
+    echo json_encode([
+        'valid' => $Insert['valid'],
+        'msg' => $Insert['msg']
+    ]);

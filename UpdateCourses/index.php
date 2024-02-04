@@ -18,17 +18,22 @@
     $shorten = $data['shortcut'];
     $year = $data['years'];
     $detail = $data['detail'];
+    echo json_encode($data);
 
-    $Insert = $function -> UpdateCourse($id, $course, $shorten, $year);
+    $course = $function -> UpdateCourse($id, $course, $shorten, $year);
+    $delete = $function -> DeleteCourseDetail($shorten);
+    // echo json_encode($course);
 
     foreach($detail as $list) {
-        $subject = $list['subject'];
-        $type = $list['type'];
-        $unit = $list['unit'];
+        // echo json_encode($list);
+        $subject = $list['Subject'];
+        $type = $list['Type'];
+        $unit = $list['Unit'];
+        $create = $function -> CreationCourseDetail($shorten, $subject, $type, $unit);
     }
 
     
     echo json_encode([
-        'valid' => $Insert['valid'],
-        'msg' => $Insert['valid'] ? $Insert['msg'] : $Insert['error']
+        'valid' => $course['valid'],
+        'msg' => $course['valid'] ? $course['msg'] : $course['error']
     ]);

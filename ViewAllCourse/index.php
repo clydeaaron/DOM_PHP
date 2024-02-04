@@ -23,6 +23,7 @@
     } else {
         echo json_encode([
             'valid' => false,
-            'msg' => $select['msg']
+            'msg' => $select['msg'],
+            'data' => []
         ]);
     }

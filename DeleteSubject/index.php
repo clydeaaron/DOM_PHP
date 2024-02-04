@@ -15,10 +15,10 @@
 
     $id = $data['id'];
 
-    $Insert = $function -> DeleteCourse($id);
+    $Insert = $function -> DeleteSubject($id);
 
     
     echo json_encode([
         'valid' => $Insert['valid'],
-        'msg' => $Insert['valid'] ? $Insert['msg'] : $Insert['error']
+        'msg' => $Insert['valid'] ? $Insert['msg'] : $Insert['msg']
     ]);

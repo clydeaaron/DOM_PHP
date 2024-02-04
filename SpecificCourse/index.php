@@ -1,4 +1,4 @@
-<?php 
+<?php
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
     header("Access-Control-Allow-Headers: *");
@@ -12,19 +12,20 @@
     $request_body = file_get_contents('php://input');
     $data = json_decode($request_body, true);
     $function = new functions();
+    $course = $data['id'];
+    
+    $data = $function -> FetchSpecificCourse($course);
+    $details = $function -> FetchCourseDetail($data['data'][0]['shortcut']);
 
-
-    $view = $function -> ViewAllEnrolled();
-
-    if($view['valid']) {
+    if($data['valid']) {
         echo json_encode([
             'valid' => true,
-            'data' => $view['data']
+            'data' => $data['data'],
+            'details' => $details['data']
         ]);
     } else {
         echo json_encode([
             'valid' => false,
-            'error' => $view['error'],
-            'data' => []
+            'msg' => $data['msg']
         ]);
     }

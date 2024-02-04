@@ -80,6 +80,8 @@
             $sql = "INSERT INTO student(student_id, firstname, middlename, lastname, birthdate, gender, course, year_level, contact_number, `status`) 
                     VALUES ('$code', '$fname', '$midname', '$lname', '$birthday', '$gender', '$course', '$year', '$contact', 'ACTIVE')";
             if($this -> connects() -> query($sql) ) {
+
+                $this -> CreateCourseStudent($code, $course);
                 return [
                     'valid' => true,
                     'msg' => "Student Add Succesfully"
@@ -272,7 +274,29 @@
             if(empty($student)) {
                 return [
                     'valid' => false,
-                    'error' => "Error! No classroom has been found!"
+                    'error' => "Error! No student has been found!"
+                ];
+            }
+
+            return [
+                'valid' => true,
+                'data' => $student
+            ];
+        }
+
+        function ViewStudentNo($student) {
+            $sql = "SELECT * FROM student WHERE student_id = '$student'";
+            $query = $this -> connects() -> query($sql);
+            $student = [];
+
+            while($list = $query -> fetch_assoc()) {
+                $student[] = $list;
+            }
+
+            if(empty($student)) {
+                return [
+                    'valid' => false,
+                    'error' => "Error! No student has been found!"
                 ];
             }
 
@@ -341,6 +365,30 @@
             ];
         }
 
+
+        function FetchSpecificCourse($course) {
+            $sql = "SELECT * FROM course WHERE id LIKE '$course'";
+            $query = $this -> connects() -> query($sql);
+            $course = [];
+
+            while($list = $query -> fetch_assoc()){
+                $course[] = $list;
+            }
+
+            if(empty($course)) {
+                return [
+                    'valid' => false,
+                    'msg' => "Error! No course has been found!"
+                ];
+            }
+
+            return [
+                'valid' => true,
+                'data' => $course
+            ];
+        }
+
+
         function UpdateSubject($id, $subject, $type) {
             $sql = "UPDATE subjects SET label = '$subject', subject_type = '$type' WHERE id = '$id'";
             
@@ -390,7 +438,7 @@
 
 
         function DeleteCourse($id) {
-            $sql = "DELETE FROM course WHERE id = '$id'";
+            $sql = "DELETE FROM course WHERE course = '$id'";
             if($this -> connects() -> query($sql)) {
                 return [
                     'valid' => true,
@@ -406,6 +454,21 @@
 
         function DeleteStudent($id) {
             $sql = "DELETE FROM student WHERE student_id = '$id'";
+            if($this -> connects() -> query($sql)) {
+                return [
+                    'valid' => true,
+                    'msg' => "Delete Successfully!"
+                ];
+            }
+
+            return [
+                'valid' => false,
+                'msg' => "Error! Invalid Delete Unsuccessful"
+            ];
+        }
+
+        function DeleteSpecificCourse($id) {
+            $sql = "DELETE FROM course WHERE shortcut = '$id'";
             if($this -> connects() -> query($sql)) {
                 return [
                     'valid' => true,
@@ -634,4 +697,102 @@
                 ];
             }
         }
+
+        function CreationCourseDetail($course, $subject, $type, $unit) {
+            $sql = "INSERT INTO course_detail (`course`, `subject`, `type`, `unit`) 
+                    VALUES('$course', '$subject', '$type', '$unit')";
+
+            $query = $this -> connects() -> query($sql);
+
+            if($query) {
+                return [
+                    'valid' => true,
+                    'msg' => "Data Created"
+                ];
+            } else {
+                return [
+                    'valid' => false,
+                    'error' => "Data has not been Created"
+                ];
+            }
+        }
+
+        function DeleteCourseDetail($course) {
+            $sql = "DELETE FROM course_detail WHERE `course` = '$course'";
+            $this -> connects() -> query($sql);
+        }
+
+        function FetchCourseDetail ($course) {
+            $sql = "SELECT * FROM course_detail WHERE `course` = '$course'";
+            $query = $this -> connects() -> query($sql);
+            $details = [];
+
+            while($list = $query -> fetch_assoc()) {
+                $details[] = $list;
+            }
+
+            if(empty($details)) {
+                return [
+                    'valid' => false,
+                    'msg' => "No Reference found"
+                ];
+            }
+            return [
+                'valid' => true,
+                'data' => $details
+            ];
+        }
+
+        function CreateCourseStudent($studentno, $course) {
+            $course_detail = $this -> FetchCourseDetail($course);
+            $data = $course_detail['data'];
+            foreach ($data as $list) {
+                $subject = $list['subject'];
+                $unit = $list['unit'];
+                $sql = "INSERT INTO enrolled (`student_id`, `subject`, `unit`) 
+                    VALUES ('$studentno', '$subject', '$unit')";
+
+                $query = $this -> connects() -> query($sql);
+            }
+        }
+
+        function FetchStudentGrade($studentno) {
+            $sql = "SELECT * FROM enrolled WHERE `student_id` = '$studentno'";
+            $query = $this -> connects() -> query($sql);
+            $details = [];
+
+            while($list = $query -> fetch_assoc()) {
+                $details[] = $list;
+            }
+
+            if(empty($details)) {
+                return [
+                    'valid' => false,
+                    'msg' => "No Reference found"
+                ];
+            }
+            return [
+                'valid' => true,
+                'data' => $details
+            ];
+        }
+
+        function UpdateGrades($id, $prelim, $midterm, $prefi, $finals) {
+            $sql = "UPDATE enrolled SET `prelim` = '$prelim', `midterm` = '$midterm', `prefinal` = '$prefi', `finals` = '$finals' WHERE `id` = '$id'";
+
+            $query = $this -> connects() -> query($sql);
+
+            if($query) {
+                return [
+                    'valid' => true,
+                    'msg' => "Update Successfully!"
+                ];
+            }
+
+            return [
+                'valid' => false,
+                'msg' => "Error! Update Unsuccessfully"
+            ];
+        }
+        
     }

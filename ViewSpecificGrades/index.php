@@ -1,4 +1,4 @@
-<?php 
+<?php
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
     header("Access-Control-Allow-Headers: *");
@@ -13,18 +13,23 @@
     $data = json_decode($request_body, true);
     $function = new functions();
 
+    $student_no = $data['student'];
 
-    $view = $function -> ViewAllEnrolled();
+    $student = $function -> ViewStudentNo($student_no);
+    $details = $function -> FetchStudentGrade($student_no);
+    $units = 0;
 
-    if($view['valid']) {
+
+    
+    if($student['valid']) {
         echo json_encode([
             'valid' => true,
-            'data' => $view['data']
+            'data' => $student['data'],
+            'data2' => $details['data'],
         ]);
     } else {
         echo json_encode([
             'valid' => false,
-            'error' => $view['error'],
-            'data' => []
+            'msg' => $details['msg']
         ]);
     }
