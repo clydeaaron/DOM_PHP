@@ -13,10 +13,11 @@
     $data = json_decode($request_body, true);
     $function = new functions();
 
+    $code = $data['code'];
     $subject = $data['Subject'];
     $type = $data['Type'];
 
-    $Insert = $function -> InsertSubject($subject, $type);
+    $Insert = $function -> InsertSubject($code, $subject, $type);
 
     
     echo json_encode([

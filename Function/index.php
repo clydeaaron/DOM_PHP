@@ -49,28 +49,7 @@
             ];
         }
 
-        function InsertSubject($subject, $type) {
-            $sql = "SELECT * FROM subjects ORDER BY id DESC LIMIT 1";
-            $query = $this -> connects() -> query($sql);
-            
-            if(mysqli_num_rows($query) === 0 ) {
-                $code = "SUBJ00000";
-            } else {
-                $fetch = $query -> fetch_assoc();
-                $last = $fetch['id'];
-
-                $baseno = intval(substr($last, 4, 5)) + 1;
-                $zero = 5 - strlen($baseno);
-                $zeros = "";
-                
-                for($i = 1; $i <= $zero; $i++) {
-                    $zeros = $zeros."0";
-                }
-
-                $baseno = $zeros.$baseno;
-                $code = "SUBJ$baseno";
-            }
-
+        function InsertSubject($code, $subject, $type) {
             $sql = "INSERT INTO subjects (`id`, `label`, `subject_type`, `status`, `modified`) 
                 VALUES ('$code', '$subject', '$type', 'Active', NOW())";
 
@@ -88,27 +67,7 @@
         }
 
         function InsertStudent ($student) {
-            $sql = "SELECT * FROM student ORDER BY student_id DESC LIMIT 1";
-            $query = $this -> connects() -> query($sql);
-            $code = "";
-            if(mysqli_num_rows($query) === 0 ) {
-                $code = "std00000";
-            } else {
-                $fetch = $query -> fetch_assoc();
-                $last = $fetch['student_id'];
-
-                $baseno = intval(substr($last, 3, 5)) + 1;
-                $zero = 5 - strlen($baseno);
-                $zeros = "";
-                
-                for($i = 1; $i <= $zero; $i++) {
-                    $zeros = $zeros."0";
-                }
-
-                $baseno = $zeros.$baseno;
-                $code = "std$baseno";
-            }
-
+            $code = $student['code'];
             $fname = $student['first_name'];
             $midname = $student['middle_name'];
             $lname = $student['last_name'];
