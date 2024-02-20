@@ -14,6 +14,7 @@
     $function = new functions();
     
     $student = [
+        'code' => $data['code'],
         'first_name' => $data['first_name'],
         'middle_name' => $data['middle_name'],
         'last_name' => $data['last_name'],
@@ -21,7 +22,9 @@
         'gender' => $data['gender'],
         'course' => $data['course'],
         'year' => $data['year_level'],
-        'contact' => $data['contact']
+        'semester' => $data['semester'],
+        'contact' => $data['contact'],
+        'status' => $data['status'],
     ];
 
     $insert = $function -> InsertStudent($student);

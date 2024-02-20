@@ -22,7 +22,9 @@
         'gender' => $data['gender'],
         'course' => $data['course'],
         'year' => $data['year_level'],
-        'contact' => $data['contact']
+        'semester' => $data['semester'],
+        'contact' => $data['contact'],
+        'status' => $data['status'],
     ];
 
     $Insert = $function -> UpdateStudent($student);

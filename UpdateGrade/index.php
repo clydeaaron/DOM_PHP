@@ -14,12 +14,9 @@
     $function = new functions();
 
     $id = $data['id'];
-    $prelim = $data['prelim'];
-    $midterm = $data['midterm'];
-    $prefi = $data['prefi'];
-    $finals = $data['finals'];
-
-    $Insert = $function -> UpdateGrades($id, $prelim, $midterm, $prefi, $finals);
+    $grade = $data['grade'];
+    
+    $Insert = $function -> UpdateGrades($id, $grade);
 
     
     echo json_encode([

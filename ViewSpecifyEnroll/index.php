@@ -12,9 +12,8 @@
     $request_body = file_get_contents('php://input');
     $data = json_decode($request_body, true);
     $function = new functions();
-    $room = $data['room'];
     
-    $select = $function -> ViewSpecifyEnroll($room);
+    $select = $function -> ViewSpecifyEnrolls();
     
     if($select['valid']) {
         echo json_encode([
@@ -24,6 +23,7 @@
     } else {
         echo json_encode([
             'valid' => false,
-            'msg' => $room
+            'msg' => $room,
+            'data' => []
         ]);
     }

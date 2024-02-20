@@ -24,6 +24,7 @@
         echo json_encode([
             "valid" => $login['valid'],
             "data" => $login['data'],
+            'username' => $login['username'],
             'msg' => $login['msg']
         ]);
     } else {

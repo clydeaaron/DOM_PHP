@@ -15,19 +15,20 @@
 
     $course = $data['course'];
     $shorten = $data['shorten'];
-    $years = $data['years'];
-    $detail = $data['detail'];
+    $detail = json_decode($data['detail'],true);
     $valid = true;
     $error = "";
 
-    $Insert = $function -> InsertCourse($course, $shorten, $years);
+    $Insert = $function -> InsertCourse($course, $shorten);
 
     foreach ($detail as $list) {
         $subject = $list['Subject'];
         $type = $list['Type'];
         $unit = $list['Unit'];
+        $year = $list['Year'];
+        $semester = $list['Semester'];
     
-        $create_details = $function->CreationCourseDetail($shorten, $subject, $type, $unit);
+        $create_details = $function->CreationCourseDetail($shorten, $subject, $type, $year, $semester, $unit);
     
         if ($create_details['valid'] == false) {
             $delete_course = $function -> DeleteSpecificCourse($shorten);

@@ -38,38 +38,44 @@
             if (empty($user)) {
                 return [
                     'valid' => false,
-                    'error' => "No Record has been found!"
+                    'error' => "No Record of Email or Username!"
                 ];
             }
-
+            if($user[0]['password'] === $password) {
+                return [
+                    'valid' => true,
+                    'data' => $user[0]['user_type'],
+                    'username' => $user[0]['username'], 
+                    'msg' => "retrieved"
+                ];
+            }
             return [
-                'valid' => true,
-                'data' => $user[0]['user_type'],
-                'msg' => "retrieved"
-            ];
+                    'valid' => false,
+                    'error' => "Password not Match!"
+                ];
         }
 
-        function InsertSubject($subject, $type) {
-            $sql = "SELECT * FROM subjects ORDER BY id DESC LIMIT 1";
-            $query = $this -> connects() -> query($sql);
+        function InsertSubject($code, $subject, $type) {
+            // $sql = "SELECT * FROM subjects ORDER BY id DESC LIMIT 1";
+            // $query = $this -> connects() -> query($sql);
             
-            if(mysqli_num_rows($query) === 0 ) {
-                $code = "SUBJ00000";
-            } else {
-                $fetch = $query -> fetch_assoc();
-                $last = $fetch['id'];
+            // if(mysqli_num_rows($query) === 0 ) {
+            //     $code = "SUBJ00000";
+            // } else {
+            //     $fetch = $query -> fetch_assoc();
+            //     $last = $fetch['id'];
 
-                $baseno = intval(substr($last, 4, 5)) + 1;
-                $zero = 5 - strlen($baseno);
-                $zeros = "";
+            //     $baseno = intval(substr($last, 4, 5)) + 1;
+            //     $zero = 5 - strlen($baseno);
+            //     $zeros = "";
                 
-                for($i = 1; $i <= $zero; $i++) {
-                    $zeros = $zeros."0";
-                }
+            //     for($i = 1; $i <= $zero; $i++) {
+            //         $zeros = $zeros."0";
+            //     }
 
-                $baseno = $zeros.$baseno;
-                $code = "SUBJ$baseno";
-            }
+            //     $baseno = $zeros.$baseno;
+            //     $code = "SUBJ$baseno";
+            // }
 
             $sql = "INSERT INTO subjects (`id`, `label`, `subject_type`, `status`, `modified`) 
                 VALUES ('$code', '$subject', '$type', 'Active', NOW())";
@@ -87,28 +93,45 @@
             ];
         }
 
-        function InsertStudent ($student) {
-            $sql = "SELECT * FROM student ORDER BY student_id DESC LIMIT 1";
+
+
+        function CountEnroll($id) {
+            $sql = "SELECT * FROM enrolled WHERE classroom = '$id'";
             $query = $this -> connects() -> query($sql);
-            $code = "";
-            if(mysqli_num_rows($query) === 0 ) {
-                $code = "std00000";
-            } else {
-                $fetch = $query -> fetch_assoc();
-                $last = $fetch['student_id'];
-
-                $baseno = intval(substr($last, 3, 5)) + 1;
-                $zero = 5 - strlen($baseno);
-                $zeros = "";
-                
-                for($i = 1; $i <= $zero; $i++) {
-                    $zeros = $zeros."0";
-                }
-
-                $baseno = $zeros.$baseno;
-                $code = "std$baseno";
+            $data = [];
+            while($list = $query -> fetch_assoc()) {
+                $data[] = $list;
             }
+            
+            return [
+                'valid' => true,
+                'data' => count($data)
+            ];
+        }
+        
+        function InsertStudent ($student) {
+            // $sql = "SELECT * FROM student ORDER BY student_id DESC LIMIT 1";
+            // $query = $this -> connects() -> query($sql);
+            // $code = "";
+            // if(mysqli_num_rows($query) === 0 ) {
+            //     $code = "std00000";
+            // } else {
+            //     $fetch = $query -> fetch_assoc();
+            //     $last = $fetch['student_id'];
 
+            //     $baseno = intval(substr($last, 3, 5)) + 1;
+            //     $zero = 5 - strlen($baseno);
+            //     $zeros = "";
+                
+            //     for($i = 1; $i <= $zero; $i++) {
+            //         $zeros = $zeros."0";
+            //     }
+
+            //     $baseno = $zeros.$baseno;
+            //     $code = "std$baseno";
+            // }
+
+            $code = $student['code'];
             $fname = $student['first_name'];
             $midname = $student['middle_name'];
             $lname = $student['last_name'];
@@ -117,9 +140,11 @@
             $course = $student['course'];
             $year = $student['year'];
             $contact = $student['contact'];
+            $status = $student['status'];
+            $semester = $student['semester'];
 
-            $sql = "INSERT INTO student(student_id, firstname, middlename, lastname, birthdate, gender, course, year_level, contact_number, `status`) 
-                    VALUES ('$code', '$fname', '$midname', '$lname', '$birthday', '$gender', '$course', '$year', '$contact', 'ACTIVE')";
+            $sql = "INSERT INTO student(student_id, firstname, middlename, lastname, birthdate, gender, course, year_level, semester, contact_number, `status`) 
+                    VALUES ('$code', '$fname', '$midname', '$lname', '$birthday', '$gender', '$course', '$year', '$semester', '$contact', '$status')";
             if($this -> connects() -> query($sql) ) {
 
                 $this -> CreateCourseStudent($code, $course);
@@ -347,9 +372,9 @@
             ];
         }
 
-        function InsertCourse($course, $shorten, $year) {
-            $sql = "INSERT INTO course (`course_name`, `shortcut`, `years`, `status`)
-                VALUES ('$course', '$shorten', '$year', 'ACTIVE')";
+        function InsertCourse($course, $shorten) {
+            $sql = "INSERT INTO course (`course_name`, `shortcut`, `status`)
+                VALUES ('$course', '$shorten', 'ACTIVE')";
             if(!$this -> connects() -> query($sql)) {
                 return [
                     'valid' => true,
@@ -461,8 +486,8 @@
             ];
         }
 
-        function UpdateCourse($id, $course, $shorten, $years) {
-            $sql = "UPDATE course SET course_name = '$course', shortcut = '$shorten', years = '$years' WHERE id = '$id'";
+        function UpdateCourse($id, $course, $shorten) {
+            $sql = "UPDATE course SET course_name = '$course', shortcut = '$shorten' WHERE id = '$id'";
             
             if($this -> connects() -> query($sql)) {
                 return [
@@ -479,7 +504,7 @@
 
 
         function DeleteCourse($id) {
-            $sql = "DELETE FROM course WHERE course = '$id'";
+            $sql = "DELETE FROM course WHERE id = '$id'";
             if($this -> connects() -> query($sql)) {
                 return [
                     'valid' => true,
@@ -496,6 +521,8 @@
         function DeleteStudent($id) {
             $sql = "DELETE FROM student WHERE student_id = '$id'";
             if($this -> connects() -> query($sql)) {
+                $sql = "DELETE FROM enrolled WHERE student_id = '$id'";
+                $query = $this -> connects() -> query($sql);
                 return [
                     'valid' => true,
                     'msg' => "Delete Successfully!"
@@ -532,11 +559,12 @@
             $gender = $student['gender'];
             $course = $student['course'];
             $year = $student['year'];
+            $semester = $student['semester'];
             $contact = $student['contact'];
 
             $sql = "UPDATE student SET firstname = '$fname', middlename = '$midname', 
                     lastname = '$lname', birthdate = '$birthday', gender = '$gender', course = '$course', 
-                    year_level = '$year', contact_number = '$contact' WHERE student_id = '$id' ";
+                    year_level = '$year', semester = '$semester', contact_number = '$contact' WHERE student_id = '$id' ";
             if($this -> connects() -> query($sql) ) {
                 return [
                     'valid' => true,
@@ -646,7 +674,23 @@
         }
 
         function UpdateUser($id, $user, $email, $password, $fname, $midname, $lname, $birthdate, $gender, $type){
-            $sql = "UPDATE users SET `username` ='$user', `email` ='$email', `password` = '$password', `first_name` = '$fname', `middle_name` = '$midname', `last_name` = '$lname', `birthdate` = '$birthdate', `gender` = '$gender' WHERE id = '$id'";
+            $sql = "UPDATE users SET `username` ='$user', `email` ='$email', `password` = '$password', `first_name` = '$fname', `middle_name` = '$midname', `last_name` = '$lname', `birthdate` = '$birthdate', `gender` = '$gender', `user_type` = '$type' WHERE id = '$id'";
+            $query = $this -> connects() -> query($sql);
+            if($query) {
+                return [
+                    'valid' => true,
+                    'msg' => "Update Successful"
+                ];
+            } else {
+                return [
+                    'valid' => false,
+                    'msg' => "Error! Unsuccesful Update"
+                ];
+            }
+        }
+        
+        function UpdateProfiles($id, $user, $email, $fname, $midname, $lname, $birthdate, $gender, $image){
+            $sql = "UPDATE users SET `username` ='$user', `email` ='$email', `first_name` = '$fname', `middle_name` = '$midname', `last_name` = '$lname', `birthdate` = '$birthdate', `gender` = '$gender', `profile` = '$image' WHERE id = '$id'";
             $query = $this -> connects() -> query($sql);
             if($query) {
                 return [
@@ -701,16 +745,23 @@
             }
         }
 
-        function ViewSpecifyEnroll($room) {
-            $sql = "SELECT * FROM enrolled WHERE classroom = '$room'";
+        function DeleteEnroll($id) {
+            $sql = "DELETE FROM enrolled WHERE student_id = '$id'";
             $query = $this -> connects() -> query($sql);
-            $student = [];
+        }
 
-            while($list = $query -> fetch_assoc()) {
+        function ViewSpecifyEnrolls() {
+            $sql = "SELECT a.*, b.firstname, b.middlename, b.lastname, b.course 
+                    FROM enrolled a
+                    LEFT JOIN student b ON a.student_id = b.student_id";
+            $query = $this->connects()->query($sql);
+            $student = [];
+        
+            while ($list = $query->fetch_assoc()) {
                 $student[] = $list;
             }
-
-            if(empty($student)) {
+        
+            if (empty($student)) {
                 return [
                     'valid' => false,
                     'msg' => "No Reference found"
@@ -739,9 +790,9 @@
             }
         }
 
-        function CreationCourseDetail($course, $subject, $type, $unit) {
-            $sql = "INSERT INTO course_detail (`course`, `subject`, `type`, `unit`) 
-                    VALUES('$course', '$subject', '$type', '$unit')";
+        function CreationCourseDetail($course, $subject, $type, $year, $semester, $unit) {
+            $sql = "INSERT INTO course_detail (`course`, `subject`, `type`, `year`, `semester`, `unit`) 
+                    VALUES('$course', '$subject', '$type', '$year', '$semester', '$unit')";
 
             $query = $this -> connects() -> query($sql);
 
@@ -790,8 +841,10 @@
             foreach ($data as $list) {
                 $subject = $list['subject'];
                 $unit = $list['unit'];
-                $sql = "INSERT INTO enrolled (`student_id`, `subject`, `unit`) 
-                    VALUES ('$studentno', '$subject', '$unit')";
+                $year = $list['year'];
+                $semester = $list['semester'];
+                $sql = "INSERT INTO enrolled (`student_id`, `subject`, `year`, `semester`, `unit`) 
+                    VALUES ('$studentno', '$subject', '$year', '$semester', '$unit')";
 
                 $query = $this -> connects() -> query($sql);
             }
@@ -818,9 +871,8 @@
             ];
         }
 
-        function UpdateGrades($id, $prelim, $midterm, $prefi, $finals) {
-            $sql = "UPDATE enrolled SET `prelim` = '$prelim', `midterm` = '$midterm', `prefinal` = '$prefi', `finals` = '$finals' WHERE `id` = '$id'";
-
+        function UpdateGrades($id, $grade) {
+            $sql = "UPDATE enrolled SET `grade` = '$grade' WHERE `id` = '$id'";
             $query = $this -> connects() -> query($sql);
 
             if($query) {
@@ -836,4 +888,120 @@
             ];
         }
         
+       
+        
+        function InsertProfessors($id, $professor, $student) {
+            $sql = "UPDATE enrolled SET `professor` = '$professor', `classroom` = '$id' WHERE `id` = '$student'";
+
+            $query = $this -> connects() -> query($sql);
+
+            if($query) {
+                return [
+                    'valid' => true,
+                    'msg' => "Update Successfully!"
+                ];
+            }
+
+            return [
+                'valid' => false,
+                'msg' => "Error! Update Unsuccessfully"
+            ];
+        }
+
+        function setProfessor($id, $professor) {
+            $sql = "UPDATE enrolled SET `professor` = '$professor' WHERE `id` = '$id'";
+            $query = $this -> connects() -> query($sql);
+
+            if($query) {
+                return [
+                    'valid' => true,
+                    'msg' => "Professor $professor has been inserted"
+                ];
+            }
+            
+            return [
+                'valid' => false,
+                'msg' => ""
+            ];
+        }
+        
+        function ViewProfessorChecklist() {
+            $data = [];
+            $sql = "SELECT a.*, b.id as code, b.label FROM professor_detail a
+                    LEFT JOIN subjects b ON a.subject = b.id";
+            $query = $this->connects()->query($sql);
+        
+            while ($list = $query->fetch_assoc()) {
+                $data[] = $list;
+            }
+        
+            if (empty($data)) {
+                return [
+                    'valid' => false,
+                    'msg' => "No Reference found"
+                ];
+            }
+            return [
+                'valid' => true,
+                'data' => $data
+            ];
+        }
+        
+        function InsertProfessorCheckList($subject, $professor, $semester, $year) {
+            $sql = "INSERT INTO professor_detail (`professor_id`, `subject`, `semester`, `year`, `status`)
+                VALUES ('$professor', '$subject', '$semester', '$year', 'ACTIVE')";
+            $query = $this -> connects() -> query($sql);
+
+            if($query) {
+                return [
+                    'valid' => true,
+                    'msg' => "Insert Sucessfully"
+                ];
+            }
+            
+            return [
+                'valid' => false,
+                'msg' => "Insert Unsucessfully"
+            ];
+        }
+        
+        function ViewProfile($id) {
+            $sql = "SELECT * FROM users WHERE username = '$id'";
+            $query = $this -> connects() -> query($sql);
+            $data = [];
+
+            while($list = $query -> fetch_assoc()) {
+                $data[] = $list;
+            }
+
+            if(empty($data)) {
+                
+                return [
+                    'valid' => false,
+                    'msg' => "No Reference found"
+                ];
+            }
+            
+            return [
+                'valid' => true,
+                'data' => $data
+            ];
+        }
+        
+        function UpdatePasswords ($username, $password) {
+            $sql = "UPDATE users SET `password` = '$password' WHERE `username` = '$username'";
+            $query = $this -> connects() -> query($sql);
+
+            if($query) {
+                return [
+                    'valid' => true,
+                    'msg' => "Update has been successfully"
+                ];
+            }
+            
+            return [
+                'valid' => false,
+                'msg' => "Password not updated successfully"
+            ];
+        }
     }
